@@ -1,0 +1,8 @@
+---
+- name : Install nix-env
+  ansible.builtin.shell: |
+    bash <(curl -L https://nixos.org/nix/install) --no-daemon
+  args:
+    executable: /bin/bash
+  become: true
+  
