@@ -1,0 +1,4 @@
+---
+- name: nix-env on Ubuntu (WSL2) Tasks
+  ansible.builtin.include_tasks: tasks/nix-env-ubuntu.yml
+  when: ansible_host_environment_is_wsl == "true"
