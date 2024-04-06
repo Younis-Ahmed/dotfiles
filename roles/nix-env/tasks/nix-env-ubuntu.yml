@@ -4,7 +4,6 @@
     bash <(curl -L https://nixos.org/nix/install) --no-daemon
   args:
     executable: /bin/bash
-  become: true
 
 - name: check if nix-env is installed
   ansible.builtin.command: nix-env --version
