@@ -1,0 +1,6 @@
+---
+- name: Dotefiles config
+  hosts: localhost
+  connection: local
+
+  
