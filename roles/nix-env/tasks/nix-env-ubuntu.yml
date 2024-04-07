@@ -7,6 +7,10 @@
 
 - name: check if nix-env is installed
   ansible.builtin.command: nix-env --version
-  register: nix_env_version
+  register: nix_env_check
   ignore_errors: true
   changed_when: false
+
+- name: set nix_env_version
+  set_fact:
+    nix_env_version: "{{ nix_env_check.rc == 0 }}"
