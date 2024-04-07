@@ -4,6 +4,16 @@
     bash <(curl -L https://nixos.org/nix/install) --no-daemon
   args:
     executable: /bin/bash
+  when: nix_env_check is not defined
+  notify: nix-env | Source nix-env
+
+  handlers:
+    - name: nix-env | Source nix-env
+      ansible.builtin.shell: |
+        source /home/{{ ansible_user }}/.nix-profile/etc/profile.d/nix.sh
+      args:
+        executable: /bin/bash
+      when: nix_env_check is not defined
 
 - name: check if nix-env is installed
   ansible.builtin.command: nix-env --version
@@ -12,5 +22,5 @@
   changed_when: false
 
 - name: set nix_env_check
-  set_fact:
+  ansible.builtin.set_fact:
     nix_env_check: "{{ nix_env_version.rc == 0 }}"
