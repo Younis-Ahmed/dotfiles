@@ -4,4 +4,3 @@
       source /home/{{ ansible_user }}/.nix-profile/etc/profile.d/nix.sh
     args:
       executable: /bin/bash
-    when: nix_env_check is not defined
