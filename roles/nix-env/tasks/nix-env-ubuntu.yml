@@ -1,26 +1,39 @@
 ---
-- name : nix-env | Install nix-env
-  ansible.builtin.shell: |
-    bash <(curl -L https://nixos.org/nix/install) --no-daemon
-  args:
-    executable: /bin/bash
-  when: nix_env_check is not defined
-  notify: nix-env | Source nix-env
 
-  handlers:
-    - name: nix-env | Source nix-env
-      ansible.builtin.shell: |
-        source /home/{{ ansible_user }}/.nix-profile/etc/profile.d/nix.sh
-      args:
-        executable: /bin/bash
-      when: nix_env_check is not defined
 
-- name: check if nix-env is installed
+- name: Check if nix-env is installed
   ansible.builtin.command: nix-env --version
   register: nix_env_version
   ignore_errors: true
   changed_when: false
 
-- name: set nix_env_check
+- name: Set nix_env_check
   ansible.builtin.set_fact:
     nix_env_check: "{{ nix_env_version.rc == 0 }}"
+
+- name: Nix-env | Install nix-env
+  ansible.builtin.shell: |
+    echo "nix-env is not installed on the system. Installing nix-env..." &&
+    bash <(curl -L https://nixos.org/nix/install) --no-daemon
+  args:
+    executable: /bin/bash
+  when: nix_env_check == false
+  notify: Nix-env | Source nix-env
+
+
+- name: Nix-env | Install nix packages | Check if new version is available
+  ansible.builtin.shell: |
+    nix-env -q --compare-versions nix
+  args:
+    executable: /bin/bash
+  register: nix_version
+  changed_when: false
+
+- name: Extract and compare versions
+  ansible.builtin.set_fact:
+    installed_version: "{{ nix_version.stdout.split()[1] }}"
+    available_version: "{{ nix_version.stdout.split()[3] }}"
+    is_update_available: "{{ nix_version.stdout.split()[1] != nix_env_compare_versions.stdout.split()[3] }}"
+  when: nix_version.stdout != ""
+- debug:
+  msg: "Installed version: {{ installed_version }} | Available version: {{ available_version }} | Update available: {{ is_update_available }}"
