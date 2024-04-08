@@ -25,12 +25,12 @@
 
 - name: Nix-env | Write to .bashrc
   ansible.builtin.blockinfile:
-    path: /home/younis/.bashrc
+    path: "{{ ansible_env.HOME }}/.bashrc"
     block: |
-      if [ -f /home/younis/.nix-profile/etc/profile.d/nix.sh ]; then
-        source /home/younis/.nix-profile/etc/profile.d/nix.sh
+      if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+        source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh
       fi
-      export PATH="$PATH:/home/younis/.local/bin"
+      export PATH="$PATH:{{ ansible_env.HOME }}/.nix-profile/bin"
     create: yes
 
 - debug:
@@ -64,6 +64,8 @@
     fi
   args:
     executable: /bin/bash
+  environment: 
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
   register: nix_update
   changed_when: false
   when: nix_env_check == true
