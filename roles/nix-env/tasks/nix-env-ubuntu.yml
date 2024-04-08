@@ -1,13 +1,13 @@
 ---
 
 
-- name: Check if nix-env is installed
+- name: Nix-env | Check if nix-env is installed
   ansible.builtin.command: nix-env --version
   register: nix_env_version
   ignore_errors: true
   changed_when: false
 
-- name: Set nix_env_check
+- name: Nix-env | Set nix_env_check
   ansible.builtin.set_fact:
     nix_env_check: "{{ nix_env_version.rc == 0 }}"
 
@@ -31,14 +31,15 @@
   args:
     executable: /bin/bash
   register: nix_version
+  changed_when: false
   when: nix_env_check == true
 
-- name: Extract and compare versions
+- name: Nix-env | Extract and compare versions
   ansible.builtin.set_fact:
     is_update_available: "{{ nix_version.stdout.split()[0].split('-')[1] != nix_version.stdout.split()[2] }}"
   when: nix_version.stdout != ""
 
-- name: Update nix if new version is available
+- name: Nix-env | Update nix if new version is available
   ansible.builtin.shell: |
     if [ "{{ is_update_available }}" == "true" ]; then
       echo "New version of nix is available. Updating nix to {{ nix_version.stdout.split()[2] }}..."
@@ -50,6 +51,7 @@
     executable: /bin/bash
   notify: Nix-env | Source nix-env
   register: nix_update
+  changed_when: false
   when: nix_version.stdout != ""
 
 - debug:
