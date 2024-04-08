@@ -18,8 +18,12 @@
   args:
     executable: /bin/bash
   notify: Nix-env | Source nix-env
+  register: nix_env_install
   when: nix_env_check == false
 
+- debug:
+    var: nix_env_install.stdout_lines
+  when: nix_env_check == false
 
 - name: Nix-env | Install nix packages | Check if new version is available
   ansible.builtin.shell: |
@@ -44,6 +48,9 @@
     fi
   args:
     executable: /bin/bash
+  notify: Nix-env | Source nix-env
+  register: nix_update
   when: nix_version.stdout != ""
 
-
+- debug:
+    var: nix_update.stdout_lines
