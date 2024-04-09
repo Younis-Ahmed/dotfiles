@@ -1,0 +1,4 @@
+---
+- name: python | Run Task/s
+  ansible.builtin.import_tasks: tasks/python-ubuntu.yml
+  when: ansible_os_family == 'Debian'
