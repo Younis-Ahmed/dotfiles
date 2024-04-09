@@ -1,0 +1,56 @@
+---
+
+
+- name: Python | Check if python is installed
+  ansible.builtin.command: python3 -V
+  register: python_version
+  ignore_errors: true
+  changed_when: false
+
+- name: Python | Set py_env_check
+  ansible.builtin.set_fact:
+    py_env_check: "{{ py_env_version.rc == 0 }}"
+
+- name: Python | Install python3
+  ansible.builtin.shell: |
+    echo "python is not installed on the system. Installing python..." &&
+    nix-env -iA nixpkgs.python3
+  args:
+    executable: /bin/bash
+  register: py_install
+  when: py_env_check == false
+
+- debug:
+    var: py_install.stdout_lines
+  when: py_env_check == false
+
+- name: Python | Install python | Check if new version is available
+  ansible.builtin.shell: |
+    nix-env -q --compare-versions python
+  args:
+    executable: /bin/bash
+  register: py_version
+  changed_when: false
+  when: py_env_check == true
+
+- name: Python | Extract and compare versions
+  ansible.builtin.set_fact:
+    is_update_available: "{{ py_version.stdout.split()[0].split('-')[1] != py_version.stdout.split()[2] }}"
+  when: py_version.stdout != ""
+
+- name: Python | Update python if new version is available
+  ansible.builtin.shell: |
+    if [ "{{ is_update_available }}" == "true" ]; then
+      echo "New version of python is available. Updating python to {{ py_version.stdout.split()[2] }}..."
+      nix-env -u python3
+    else
+      echo "Nix is up to date. {{ py_version.stdout.split()[0] }} no update available."
+    fi
+  args:
+    executable: /bin/bash
+  register: py_update
+  changed_when: false
+  when: py_version.stdout != ""
+
+- debug:
+    var: py_update.stdout_lines
