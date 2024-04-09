@@ -2,14 +2,14 @@
 
 
 - name: Python | Check if python is installed
-  ansible.builtin.command: python3 -V
+  ansible.builtin.command: nix-env -q --installed python3
   register: python_version
   ignore_errors: true
   changed_when: false
 
 - name: Python | Set py_env_check
   ansible.builtin.set_fact:
-    py_env_check: "{{ py_env_version.rc == 0 }}"
+    py_env_check: "{{ python_version.rc == 0 }}"
 
 - name: Python | Install python3
   ansible.builtin.shell: |
