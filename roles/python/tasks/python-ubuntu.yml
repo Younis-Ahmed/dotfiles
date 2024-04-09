@@ -42,7 +42,7 @@
   ansible.builtin.shell: |
     if [ "{{ is_update_available }}" == "true" ]; then
       echo "New version of python is available. Updating python to {{ py_version.stdout.split()[2] }}..."
-      nix-env -u python3
+      nix-env -u nixpkgs.python3
     else
       echo "Nix is up to date. {{ py_version.stdout.split()[0] }} no update available."
     fi
