@@ -43,7 +43,7 @@
   ansible.builtin.shell: |
     if [ "{{ is_update_available }}" == "true" ]; then
       echo "New version of nix is available. Updating nix to {{ nix_version.stdout.split()[2] }}..."
-      nix-env -u nix
+      nix-env -u nixpkgs.nix
     else
       echo "Nix is up to date. {{ nix_version.stdout.split()[0] }} no update available."
     fi
