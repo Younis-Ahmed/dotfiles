@@ -13,7 +13,7 @@
 
 - name: Python | Install python3
   ansible.builtin.shell: |
-    echo "python is not installed on the system. Installing python..." &&
+    echo "python is not installed on the system with Nix-env. Installing python..." &&
     nix-env -iA nixpkgs.python3
   args:
     executable: /bin/bash
