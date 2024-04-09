@@ -44,7 +44,7 @@
       echo "New version of python is available. Updating python to {{ py_version.stdout.split()[2] }}..."
       nix-env -u nixpkgs.python3
     else
-      echo "Nix is up to date. {{ py_version.stdout.split()[0] }} no update available."
+      echo "python is up to date. {{ py_version.stdout.split()[0] }} no update available."
     fi
   args:
     executable: /bin/bash
