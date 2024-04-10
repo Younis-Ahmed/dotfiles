@@ -1,6 +1,5 @@
 ---
 
-
 - name: Python | Check if python is installed
   ansible.builtin.command: nix-env -q --installed python3
   register: python_version
