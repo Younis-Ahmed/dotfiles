@@ -12,10 +12,15 @@
 
 - name: Python | Install python3
   ansible.builtin.shell: |
+    echo "Current PATH: $PATH" &&
     echo "python is not installed on the system with Nix-env. Installing python..." &&
-    nix-env -iA nixpkgs.python3
+    if [ -f /home/younis/.nix-profile/etc/profile.d/nix.sh ]; then
+      source /home/younis/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.python3
+    fi
   args:
     executable: /bin/bash
+  environment:
+    PATH: "/home/younis/.nix-profile/bin"
   register: py_install
   when: py_env_check == false
 
