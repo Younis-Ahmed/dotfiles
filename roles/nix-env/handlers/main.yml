@@ -2,5 +2,9 @@
   - name: Nix-env | Source nix-env
     ansible.builtin.shell: |
       source /home/{{ ansible_user }}/.nix-profile/etc/profile.d/nix.sh
+      if [ -f /home/{{ ansible_user }}/.bashrc ]; then
+        echo 'export PATH="$HOME/.nix-profile/bin:$PATH"' >> /home/{{ ansible_user }}/.bashrc
+        source /home/{{ ansible_user }}/.bashrc
+      fi
     args:
       executable: /bin/bash
