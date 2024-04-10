@@ -27,8 +27,9 @@ USER younis
 # Set the working directory
 WORKDIR /home/younis
 
-# Clone the ansible-playbook 
-COPY . .
 
 # Install necessary packages and setup ansible
 RUN sudo apt-get install -y curl xz-utils git ansible
+
+# Clone the ansible-playbook 
+COPY . .
