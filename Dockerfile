@@ -6,7 +6,8 @@ FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install tzdata package separately
-RUN apt-get update -y && apt-get install -y tzdata
+RUN apt-get update -y
+RUN apt-get install -y tzdata
 
 # Set your timezone
 RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata
