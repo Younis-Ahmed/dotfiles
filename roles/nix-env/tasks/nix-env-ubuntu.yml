@@ -20,9 +20,18 @@
     bash <(curl -L https://nixos.org/nix/install) --no-daemon
   args:
     executable: /bin/bash
-  notify: Nix-env | Source nix-env
   register: nix_env_install
   when: nix_env_check == false
+
+- name: Nix-env | Write to .bashrc
+  ansible.builtin.blockinfile:
+    path: /home/younis/.bashrc
+    block: |
+      if [ -f /home/younis/.nix-profile/etc/profile.d/nix.sh ]; then
+        source /home/younis/.nix-profile/etc/profile.d/nix.sh
+      fi
+      export PATH="$PATH:/home/younis/.local/bin"
+    create: yes
 
 - debug:
     var: nix_env_install.stdout_lines
@@ -55,7 +64,6 @@
     fi
   args:
     executable: /bin/bash
-  notify: Nix-env | Source nix-env
   register: nix_update
   changed_when: false
   when: nix_env_check == true
