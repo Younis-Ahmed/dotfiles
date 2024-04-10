@@ -1,6 +1,6 @@
----
+
   - name: Nix-env | Source nix-env
-    ansible.builtin.shell: |
-      source $HOME/.nix-profile/etc/profile.d/nix.sh
-    args:
-      executable: /bin/bash
+    ansible.builtin.lineinfile:
+      path: $HOME/.bashrc
+      line: 'source $HOME/.nix-profile/etc/profile.d/nix.sh'
+      create: yes
