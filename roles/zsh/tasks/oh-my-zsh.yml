@@ -1,0 +1,26 @@
+---
+
+- name: Zsh | Install oh-my-zsh
+  ansible.builtin.shell: |
+    if [ ! -d "{{ ansible_env.HOME }}/.oh-my-zsh" ]; then
+      echo "Installing oh-my-zsh..."
+      nix-env -iA nixpkgs.oh-my-zsh
+    else
+      echo "oh-my-zsh already installed."
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: oh_my_zsh_install
+
+- debug:
+    var: oh_my_zsh_install.stdout_lines
+  when: oh_my_zsh_install.changed == true
+
+- name: oh-my-zsh | Setup
+  ansible.builtin.shell: |
+    if [ -f "{{ ansible_env.HOME }}/.nix-profile/share/oh-my-zsh/templates/zshrc.zsh-template" ]; then
+      echo "Setting up oh-my-zsh..."
+      cp -r {{ ansible_env.HOME }}/.nix-profile/share/oh-my-zsh {{ ansible_env.HOME }}/.oh-my-zsh
+    fi
