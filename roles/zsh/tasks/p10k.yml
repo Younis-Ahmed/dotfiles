@@ -1,0 +1,29 @@
+--- 
+
+- name: Zsh | Install powerlevel10k
+  ansible.builtin.shell: |
+    if [ ! -d "{{ ansible_env.HOME }}/.oh-my-zsh/themes/powerlevel10k" ]; then
+      echo "Installing powerlevel10k..."
+      nix-env -iA nixpkgs.zsh-powerlevel10k
+    else
+      echo "powerlevel10k already installed."
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: p10k_install
+
+- debug:
+    var: p10k_install.stdout_lines
+  when: p10k_install.changed == true
+  
+- name : Zsh | Set powerlevel10k theme
+  ansible.builtin.git:
+    repo: 'https://github.com/romkatv/powerlevel10k.git'
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/themes/powerlevel10k"
+  args:
+    executable: /bin/bash
+  register: p10k_theme
+  when: p10k_install.changed == true
+    
