@@ -3,14 +3,14 @@
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.config"
     state: directory
-    owner: "{{ whoami }}"
-    group: "{{ whoami }}"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
     mode: 0755
 
 - name: Bash | Copy .bashrc
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/roles/bash/files/.bashrc"
     dest: "{{ ansible_env.HOME }}/.bashrc"
-    owner: "{{ whoami }}"
-    group: "{{ whoami }}"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
     mode: 0644
