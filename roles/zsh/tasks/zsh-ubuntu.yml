@@ -1,0 +1,98 @@
+---
+
+- name: Zsh | Check if zsh is installed
+  ansible.builtin.command: nix-env -q --installed zsh
+  register: zsh_version
+  ignore_errors: true
+  changed_when: false
+
+- name: Zsh | Set zsh_env_check
+  ansible.builtin.set_fact:
+    zsh_env_check: "{{ zsh_version.rc == 0 }}"
+
+- name: Zsh | Install zsh
+  ansible.builtin.shell: |
+    echo "zsh is not installed on the system with Nix-env. Installing zsh..." &&
+    if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+      source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.zsh
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: zsh_install
+  when: zsh_env_check == false
+
+- debug:
+    var: zsh_install.stdout_lines
+  when: zsh_env_check == false
+
+- name: Zsh | Install zsh | Check if new version is available
+  ansible.builtin.shell: |
+    nix-env -q --compare-versions zsh
+  args:
+    executable: /bin/bash
+  register: zsh_version
+  changed_when: false
+  when: zsh_env_check == true
+
+- name: Zsh | Extract and compare versions
+  ansible.builtin.set_fact:
+    is_update_available: "{{ zsh_version.stdout.split()[0].split('-')[1] != zsh_version.stdout.split()[2] }}"
+  when: zsh_env_check == true
+
+- name: Zsh | Update zsh if new version is available
+  ansible.builtin.shell: |
+    if [ "{{ is_update_available }}" == "true" ]; then
+      echo "New version of zsh is available. Updating zsh to {{ zsh_version.stdout.split()[2] }}..."
+      nix-env -u nixpkgs.zsh
+    else
+      echo "zsh is up to date. {{ zsh_version.stdout.split()[0] }} no update available."
+    fi
+  args:
+    executable: /bin/bash
+  environment: 
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: zsh_update
+  changed_when: false
+  when: zsh_env_check == true
+
+- debug:
+    var: zsh_update.stdout_lines
+
+- name: Zsh | Change default shell to zsh
+  become: true
+  ansible.builtin.shell: |
+    echo "Changing default shell to zsh..." &&
+    sudo chsh -s $(which zsh)
+  args:
+    executable: /bin/bash
+  register: zsh_change
+  when: zsh_env_check == true
+
+- debug:
+    var: zsh_change.stdout_lines
+
+- name: Zsh | Ensure .config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config"
+    state: directory
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+    mode: 0755
+
+- name: Zsh | Copy .zshrc
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/roles/zsh/files/.zshrc"
+    dest: "{{ ansible_env.HOME }}/.zshrc"
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+    mode: 0644
+
+- name: Zsh | Create .zsh_private
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.zsh_private"
+    state: directory
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+    mode: 0755
