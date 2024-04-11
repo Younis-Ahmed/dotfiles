@@ -77,22 +77,22 @@
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.config"
     state: directory
-    owner: "{{ whoami }}"
-    group: "{{ whoami }}"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
     mode: 0755
 
 - name: Zsh | Copy .zshrc
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/roles/zsh/files/.zshrc"
     dest: "{{ ansible_env.HOME }}/.zshrc"
-    owner: "{{ whoami }}"
-    group: "{{ whoami }}"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
     mode: 0644
 
 - name: Zsh | Create .zsh_private
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.zsh_private"
     state: directory
-    owner: "{{ ansible_env.USER }}"
-    group: "{{ ansible_env.USER }}"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
     mode: 0755
