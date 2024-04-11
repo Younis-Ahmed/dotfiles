@@ -89,6 +89,16 @@
     group: "{{ ansible_user_id }}"
     mode: 0644
 
+- name: Nix-env | Write to .zshrc
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    block: |
+      if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+        source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh
+      fi
+      export PATH="$PATH:{{ ansible_env.HOME }}/.nix-profile/bin"
+    create: yes
+
 - name: Zsh | Create .zsh_private
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.zsh_private"
