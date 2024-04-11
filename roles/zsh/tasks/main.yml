@@ -4,10 +4,14 @@
   ansible.builtin.import_tasks: tasks/zsh-ubuntu.yml
   when: ansible_os_family == 'Debian'
 
-- name: Zsh | Run Task/s
+- name: Oh my zsh | Run Task/s
   ansible.builtin.import_tasks: tasks/oh-my-zsh.yml
   when: ansible_os_family == 'Debian'
 
-- name: Zsh | Run Task/s
+- name: Powerlevel10k | Run Task/s
   ansible.builtin.import_tasks: tasks/p10k.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Zsh-syntax-highlighting | Run Task/s
+  ansible.builtin.import_tasks: tasks/zsh-syntax-highlighting.yml
   when: ansible_os_family == 'Debian'
