@@ -23,7 +23,7 @@
     path: "{{ ansible_env.HOME }}/.oh-my-zsh/themes"
     state: directory
     mode: '0755'
-    become: yes
+  become: true
 
 - name : Zsh | Set powerlevel10k theme
   ansible.builtin.git:
