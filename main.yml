@@ -4,7 +4,11 @@
   connection: local
 
   pre_tasks:
-
+    - name: Stoe whoami
+      ansible.builtin.set_fact:
+        whoami: "{{ lookup('env', 'USER') }}"
+      tags:
+        - always
 
   tasks:
     - name: Set roles
