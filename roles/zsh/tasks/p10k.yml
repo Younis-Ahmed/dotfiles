@@ -17,13 +17,18 @@
 - debug:
     var: p10k_install.stdout_lines
   when: p10k_install.changed == true
-  
+
+- name: Ensure themes directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.oh-my-zsh/themes"
+    state: directory
+    mode: '0755'
+    become: yes
+
 - name : Zsh | Set powerlevel10k theme
   ansible.builtin.git:
     repo: 'https://github.com/romkatv/powerlevel10k.git'
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh/themes/powerlevel10k"
-  args:
-    executable: /bin/bash
   register: p10k_theme
   when: p10k_install.changed == true
     
