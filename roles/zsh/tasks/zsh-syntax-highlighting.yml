@@ -1,4 +1,10 @@
 ---
+- name: Ensure themes directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.oh-my-zsh/plugins"
+    state: directory
+    mode: '0755'
+  become: true
 
 - name: Zsh | Install zsh-syntax-highlighting
   ansible.builtin.git:
@@ -7,5 +13,5 @@
 
 - name: Zsh | zsh-auto-suggestions | Install
   ansible.builtin.git:
-    repo: 'git clone https://github.com/zsh-users/zsh-autosuggestions'
+    repo: 'https://github.com/zsh-users/zsh-autosuggestions'
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
