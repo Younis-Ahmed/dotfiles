@@ -1,7 +1,7 @@
 ---
 - name: Ensure themes directory exists
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.oh-my-zsh/plugins"
+    path: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins"
     state: directory
     mode: '0755'
   become: true
