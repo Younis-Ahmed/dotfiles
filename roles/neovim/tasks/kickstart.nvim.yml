@@ -9,6 +9,7 @@
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
+  become: true
   loop:
     - git
     - ripgrep
@@ -19,4 +20,4 @@
 - name: Neovim | Kickstart | Run Task/s
   ansible.builtin.git:
     repo: "https://github.com/nvim-lua/kickstart.nvim.git"
-    dest: "{{ ansible_env.HOME }}/.config/nvim/kickstart.nvim"
+    dest: "{{ ansible_env.HOME }}/.config/nvim/"
