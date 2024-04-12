@@ -1,0 +1,60 @@
+---
+
+- name: Neovim | Check if neovim is installed
+  ansible.builtin.shell: "nix-env -q --installed neovim"
+  register: neovim_check
+  ignore_errors: true
+
+- name: Neovim | Set neovim_env_check
+  ansible.builtin.set_fact:
+    neovim_env_check: "{{ neovim_check.rc == 0 }}"
+
+- name: Neovim | Install neovim
+  ansible.builtin.shell: |
+    echo "neovim is not installed on the system with Nix-env. Installing neovim..." &&
+    if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+      source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.neovim
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: neovim_install
+  when: neovim_env_check == false
+
+- debug:
+    var: neovim_install.stdout_lines
+  when: neovim_env_check == false
+
+- name: Neovim | Install neovim | Check if new version is available
+  ansible.builtin.shell: |
+    nix-env -q --compare-versions neovim
+  args:
+    executable: /bin/bash
+  register: neovim_version
+  changed_when: false
+  when: neovim_env_check == true
+
+- name: Neovim | Extract and compare versions
+  ansible.builtin.set_fact:
+    is_update_available: "{{ neovim_version.stdout.split()[0].split('-')[1] != neovim_version.stdout.split()[2] }}"
+  when: neovim_env_check == true
+
+- name: Neovim | Update neovim if new version is available
+  ansible.builtin.shell: |
+    if [ "{{ is_update_available }}" == "true" ]; then
+      echo "New version of neovim is available. Updating neovim to {{ neovim_version.stdout.split()[2] }}..."
+      nix-env -u nixpkgs.neovim
+    else
+      echo "neovim is up to date. {{ neovim_version.stdout.split()[0] }} no update available."
+    fi
+  args:
+    executable: /bin/bash
+  environment: 
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: neovim_update
+  changed_when: false
+  when: neovim_env_check == true
+
+- debug:
+    var: neovim_update.stdout_lines
