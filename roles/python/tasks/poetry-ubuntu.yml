@@ -1,0 +1,63 @@
+---
+
+# Path: roles/poetry/tasks/poetry-ubuntu.yml
+
+- name: Poetry | Check if poetry is installed
+  ansible.builtin.command: nix-env -q --installed poetry
+  register: poetry_version
+  ignore_errors: true
+  changed_when: false
+
+- name: Poetry | Set poetry_env_check
+  ansible.builtin.set_fact:
+    poetry_env_check: "{{ poetry_version.rc == 0 }}"
+
+- name: Poetry | Install Poetry
+  ansible.builtin.shell: |
+    echo "poetry is not installed on the system with Nix-env. Installing poetry..." &&
+    if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+      source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.poetry
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: poetry_install
+  when: poetry_env_check == false
+
+- debug:
+    var: poetry_install.stdout_lines
+  when: poetry_env_check == false
+
+- name: Poetry | Install poetry | Check if new version is available
+  ansible.builtin.shell: |
+    nix-env -q --compare-versions poetry
+  args:
+    executable: /bin/bash
+  register: poetry_version
+  changed_when: false
+  when: poetry_env_check == true
+
+- name: Poetry | Extract and compare versions
+  ansible.builtin.set_fact:
+    is_update_available: "{{ poetry_version.stdout.split()[0].split('-')[1] != poetry_version.stdout.split()[2] }}"
+  when: poetry_env_check == true
+
+- name: Poetry | Update poetry if new version is available
+  ansible.builtin.shell: |
+    if [ "{{ is_update_available }}" == "true" ]; then
+      echo "New version of python is available. Updating python to {{ poetry_version.stdout.split()[2] }}..."
+      nix-env -u nixpkgs.poetry
+    else
+      echo "python is up to date. {{ poetry_version.stdout.split()[0] }} no update available."
+    fi
+  args:
+    executable: /bin/bash
+  environment: 
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: poetry_update
+  changed_when: false
+  when: poetry_env_check == true
+
+- debug:
+    var: poetry_update.stdout_lines
