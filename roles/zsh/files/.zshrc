@@ -119,4 +119,4 @@ export PATH="$PATH:/opt/nvim-linux64/bin"
 if [ -e /home/younis/.nix-profile/etc/profile.d/nix.sh ]; then . /home/younis/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
 # Created by `pipx` on 2024-03-26 18:26:32
-export PATH="$PATH:/home/younis/.nix-profile/bin"
+export PATH="$PATH:$HOME/.nix-profile/bin"
