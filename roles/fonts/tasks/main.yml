@@ -6,14 +6,24 @@
     dest: "/tmp/FiraCode.zip"
     mode: '0440'
 
+- name: Unzip
+  ansible.builtin.package:
+    name: unzip
+    state: present
+  become: true
+
 - name: Unarchive Nerd Fonts
   ansible.builtin.unarchive:
     src: "/tmp/FiraCode.zip"
     dest: "/tmp"
     remote_src: yes
 
+- name: Find font file
+  ansible.builtin.shell: "find /tmp -name '*.otf'"
+  register: font_file
+
 - name: Install Nerd Fonts
   ansible.builtin.file:
-    src: "/tmp/FiraCode Nerd Font Complete.otf"
+    src: "{{ font_file.stdout }}"
     dest: "~/.local/share/fonts/FiraCode Nerd Font Complete.otf"
     state: link
