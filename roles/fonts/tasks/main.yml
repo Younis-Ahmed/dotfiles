@@ -1,0 +1,19 @@
+---
+
+- name: Download Nerd Fonts
+  ansible.builtin.get_url:
+    url: https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
+    dest: "/tmp/FiraCode.zip"
+    mode: '0440'
+
+- name: Unarchive Nerd Fonts
+  ansible.builtin.unarchive:
+    src: "/tmp/FiraCode.zip"
+    dest: "/tmp"
+    remote_src: yes
+
+- name: Install Nerd Fonts
+  ansible.builtin.file:
+    src: "/tmp/FiraCode Nerd Font Complete.otf"
+    dest: "~/.local/share/fonts/FiraCode Nerd Font Complete.otf"
+    state: link
