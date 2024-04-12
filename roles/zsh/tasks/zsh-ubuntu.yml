@@ -81,6 +81,14 @@
     group: "{{ ansible_user_id }}"
     mode: 0755
 
+- name: Zsh | Ensure .config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/zsh"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: 0755
+
 - name: Zsh | Copy .zshrc
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/roles/zsh/files/.zshrc"
@@ -106,3 +114,10 @@
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
     mode: 0755
+
+- name: Zsh | Set private variables
+  ansible.builtin.template:
+    dest: "{{ ansible_user_dir }}/.config/zsh/.zsh_private"
+    src: ".zsh_private.j2"
+    mode: "0644"
+  no_log: true
