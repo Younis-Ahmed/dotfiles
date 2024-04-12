@@ -1,0 +1,60 @@
+--- 
+- name: Pipx | Check if pipx is installed
+  ansible.builtin.command: nix-env -q --installed pipx
+  register: pip_version
+  ignore_errors: true
+  changed_when: false
+
+- name: Pipx | Set pip_env_check
+  ansible.builtin.set_fact:
+    pip_env_check: "{{ pip_version.rc == 0 }}"
+
+- name: Pipx | Install pipx
+  ansible.builtin.shell: |
+    echo "pipx is not installed on the system with Nix-env. Installing pipx..." &&
+    if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+      source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.pipx
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: pip_install
+  when: pip_env_check == false
+
+- debug:
+    var: pip_install.stdout_lines
+  when: pip_env_check == false
+
+- name: Pipx | Install pipx | Check if new version is available
+  ansible.builtin.shell: |
+    nix-env -q --compare-versions pipx
+  args:
+    executable: /bin/bash
+  register: pip_version
+  changed_when: false
+  when: pip_env_check == true
+
+- name: Pipx | Extract and compare versions
+  ansible.builtin.set_fact:
+    is_update_available: "{{ pip_version.stdout.split()[0].split('-')[1] != pip_version.stdout.split()[2] }}"
+  when: pip_env_check == true
+
+- name: Pipx | Update pip if new version is available
+  ansible.builtin.shell: |
+    if [ "{{ is_update_available }}" == "true" ]; then
+      echo "New version of pip is available. Updating pip to {{ pip_version.stdout.split()[2] }}..."
+      nix-env -u nixpkgs.pipx
+    else
+      echo "pip is up to date. {{ pip_version.stdout.split()[0] }} no update available."
+    fi
+  args:
+    executable: /bin/bash
+  environment: 
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: pip_update
+  changed_when: false
+  when: pip_env_check == true
+
+- debug:
+    var: pip_update.stdout_lines
