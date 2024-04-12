@@ -1,4 +1,12 @@
 ---
-- name: python | Run Task/s
+- name: Python | Run Task/s
   ansible.builtin.import_tasks: tasks/python-ubuntu.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Poetry | Run Task/s
+  ansible.builtin.import_tasks: tasks/poetry-ubuntu.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Pipx | Run Task/s
+  ansible.builtin.import_tasks: tasks/pipx-ubuntu.yml
   when: ansible_os_family == 'Debian'
