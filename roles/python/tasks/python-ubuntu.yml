@@ -12,49 +12,50 @@
 
 - name: Python | Install python3
   ansible.builtin.shell: |
-    echo "Current PATH: $PATH" &&
     echo "python is not installed on the system with Nix-env. Installing python..." &&
-    if [ -f /home/younis/.nix-profile/etc/profile.d/nix.sh ]; then
-      source /home/younis/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.python3
+    if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+      source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.python3
     fi
   args:
     executable: /bin/bash
   environment:
-    PATH: "/home/younis/.nix-profile/bin"
-  register: py_install
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: poetry_install
   when: py_env_check == false
 
 - debug:
-    var: py_install.stdout_lines
+    var: poetry_install.stdout_lines
   when: py_env_check == false
 
 - name: Python | Install python | Check if new version is available
   ansible.builtin.shell: |
-    nix-env -q --compare-versions python
+    nix-env -q --compare-versions python3
   args:
     executable: /bin/bash
-  register: py_version
+  register: poetry_version
   changed_when: false
   when: py_env_check == true
 
 - name: Python | Extract and compare versions
   ansible.builtin.set_fact:
-    is_update_available: "{{ py_version.stdout.split()[0].split('-')[1] != py_version.stdout.split()[2] }}"
-  when: py_version.stdout != ""
+    is_update_available: "{{ poetry_version.stdout.split()[0].split('-')[1] != poetry_version.stdout.split()[2] }}"
+  when: py_env_check == true
 
 - name: Python | Update python if new version is available
   ansible.builtin.shell: |
     if [ "{{ is_update_available }}" == "true" ]; then
-      echo "New version of python is available. Updating python to {{ py_version.stdout.split()[2] }}..."
+      echo "New version of python is available. Updating python to {{ poetry_version.stdout.split()[2] }}..."
       nix-env -u nixpkgs.python3
     else
-      echo "python is up to date. {{ py_version.stdout.split()[0] }} no update available."
+      echo "python is up to date. {{ poetry_version.stdout.split()[0] }} no update available."
     fi
   args:
     executable: /bin/bash
+  environment: 
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
   register: py_update
   changed_when: false
-  when: py_version.stdout != ""
+  when: py_env_check == true
 
 - debug:
     var: py_update.stdout_lines
