@@ -83,7 +83,7 @@
 
 - name: Zsh | Ensure .config directory exists
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.config/zsh"
+    path: "{{ ansible_env.HOME }}/.config"
     state: directory
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
@@ -107,10 +107,18 @@
       export PATH="$PATH:{{ ansible_env.HOME }}/.nix-profile/bin"
     create: yes
 
-- name: Zsh | Create .zsh_private
+- name: Zsh | Create zsh directory
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.zsh_private"
+    path: "{{ ansible_env.HOME }}/.config/zsh"
     state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: 0755
+
+- name: Zsh | Create .zsh_private file
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/zsh/.zsh_private"
+    state: touch
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
     mode: 0755
