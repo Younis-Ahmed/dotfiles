@@ -1,0 +1,9 @@
+---
+
+- name: Neovim | Run Task/s
+  ansible.builtin.import_tasks: "tasks/neovim.yml"
+  when: ansible_os_family == 'Debian'
+
+- name: Neovim | kickstart.nvim | Run Task/s
+  ansible.builtin.import_tasks: "tasks/kickstart.nvim.yml"
+  when: ansible_os_family == 'Debian'
