@@ -125,7 +125,6 @@
 
 - name: Zsh | Set private variables
   ansible.builtin.template:
-    dest: "{{ ansible_user_dir }}/.config/zsh/.zsh_private"
+    dest: "{{ ansible_env.HOME }}/.config/zsh/.zsh_private"
     src: ".zsh_private.j2"
     mode: "0644"
-  no_log: true
