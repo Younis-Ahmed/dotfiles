@@ -1,0 +1,22 @@
+---
+
+- name: Ensure nvim directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/nvim"
+    state: directory
+
+- name: Ensure kickstart.nvim prerequisites are installed
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - git
+    - ripgrep
+    - make
+    - gcc
+    - unzip
+
+- name: Neovim | Kickstart | Run Task/s
+  ansible.builtin.git:
+    repo: "https://github.com/nvim-lua/kickstart.nvim.git"
+    dest: "{{ ansible_env.HOME }}/.config/nvim/kickstart.nvim"
