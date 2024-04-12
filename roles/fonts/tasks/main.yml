@@ -18,12 +18,26 @@
     dest: "/tmp"
     remote_src: yes
 
-- name: Find font file
+- name: Find font files
   ansible.builtin.shell: "find /tmp -name '*.otf'"
-  register: font_file
+  register: font_files
 
-- name: Install Nerd Fonts
+- name: Zsh | Create fonts directory
   ansible.builtin.file:
-    src: "{{ font_file.stdout }}"
-    dest: "~/.local/share/fonts/FiraCode Nerd Font Complete.otf"
-    state: link
+    path: "/etc/fonts"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: 0755
+  become: true
+
+- name: Install fontconfig
+  ansible.builtin.package:
+    name: fontconfig
+    state: present
+  become: true
+
+- name: Update font cache
+  ansible.builtin.command:
+    cmd: fc-cache -fv
+  become: true
