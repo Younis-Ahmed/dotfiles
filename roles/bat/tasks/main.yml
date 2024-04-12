@@ -1,0 +1,61 @@
+---
+
+- name: "Bat | Check if bat is installed"
+  ansible.builtin.shell: "nix-env -q --installed bat"
+  register: bat_check
+  ignore_errors: true
+
+- name: "Bat | Set bat_env_check"
+  ansible.builtin.set_fact:
+    bat_env_check: "{{ bat_check.rc == 0 }}"
+
+- name: "Bat | Install bat"
+  ansible.builtin.shell: |
+    echo "bat is not installed on the system with Nix-env. Installing bat..." &&
+    if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+      source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.bat
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: bat_install
+  when: bat_env_check == false
+
+- debug:
+    var: bat_install.stdout_lines
+  when: bat_env_check == false
+
+- name: "Bat | Install bat | Check if new version is available"
+  ansible.builtin.shell: |
+    nix-env -q --compare-versions bat
+  args:
+    executable: /bin/bash
+  register: bat_version
+  changed_when: false
+  when: bat_env_check == true
+
+- name: "Bat | Extract and compare versions"
+  ansible.builtin.set_fact:
+    is_update_available: "{{ bat_version.stdout.split()[0].split('-')[1] != bat_version.stdout.split()[2] }}"
+  when: bat_env_check == true
+
+- name: "Bat | Update bat if new version is available"
+  ansible.builtin.shell: |
+    if [ "{{ is_update_available }}" == "true" ]; then
+      echo "New version of bat is available. Updating bat to {{ bat_version.stdout.split()[2] }}..."
+      nix-env -u nixpkgs.bat
+    else
+      echo "bat is up to date. {{ bat_version.stdout.split()[0] }} no update available."
+    fi
+  args:
+    executable: /bin/bash
+  environment: 
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: bat_update
+  changed_when: false
+  when: bat_env_check == true
+
+- debug:
+    var: bat_update.stdout_lines
+
