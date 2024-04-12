@@ -116,6 +116,8 @@ alias cat="bat"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 export PATH="$PATH:/opt/nvim-linux64/bin"
 
+[[ -f ~/.confg/zsh/.zsh_private ]] && source ~/.confg/zsh/.zsh_private
+
 if [ -e /home/younis/.nix-profile/etc/profile.d/nix.sh ]; then . /home/younis/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
 # Created by `pipx` on 2024-03-26 18:26:32
