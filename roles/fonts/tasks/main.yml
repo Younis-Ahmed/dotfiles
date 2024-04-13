@@ -2,8 +2,14 @@
 
 - name: Download Nerd Fonts
   ansible.builtin.get_url:
-    url: https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
+    url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/FiraCode.zip
     dest: "/tmp/FiraCode.zip"
+    mode: '0440'
+
+- name: Download DroidSansMNerdFont-Regular.otf
+  ansible.builtin.get_url:
+    url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/DroidSansMono.zip
+    dest: "/tmp/DroidSansMono.zip"
     mode: '0440'
 
 - name: Unzip
@@ -18,18 +24,21 @@
     dest: "/tmp"
     remote_src: yes
 
-- name: Find font files
-  ansible.builtin.shell: "find /tmp -name '*.otf'"
-  register: font_files
+- name: Unarchive Droid
+  ansible.builtin.unarchive:
+    src: "/tmp/DriodSansMono.zip"
+    dest: "/tmp"
+    remote_src: yes
 
-- name: Zsh | Create fonts directory
+- name: Ensure local fonts directory exists
   ansible.builtin.file:
-    path: "/etc/fonts"
+    path: "~/.local/share/fonts/"
     state: directory
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    mode: 0755
-  become: true
+    mode: '0755'
+
+- name: Move Nerd Font to local fonts directory
+  ansible.builtin.shell: | 
+    mv /tmp/DroidSansMNerdFont-Regular.otf ~/.local/share/fonts/
 
 - name: Install fontconfig
   ansible.builtin.package:
@@ -40,4 +49,3 @@
 - name: Update font cache
   ansible.builtin.command:
     cmd: fc-cache -fv
-  become: true
