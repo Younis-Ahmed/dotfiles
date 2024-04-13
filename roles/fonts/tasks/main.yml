@@ -26,7 +26,7 @@
 
 - name: Unarchive Droid
   ansible.builtin.unarchive:
-    src: "/tmp/DriodSansMono.zip"
+    src: "/tmp/DroidSansMono.zip"
     dest: "/tmp"
     remote_src: yes
 
@@ -36,9 +36,13 @@
     state: directory
     mode: '0755'
 
-- name: Move Nerd Font to local fonts directory
+- name: Move Droid to local fonts directory
   ansible.builtin.shell: | 
     mv /tmp/DroidSansMNerdFont-Regular.otf ~/.local/share/fonts/
+
+- name: Move Droid to local fonts directory
+  ansible.builtin.shell: | 
+    mv /tmp/*.ttf ~/.local/share/fonts/
 
 - name: Install fontconfig
   ansible.builtin.package:
