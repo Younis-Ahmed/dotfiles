@@ -7,6 +7,10 @@
     state: present
   become: true
 
-- name: "Git | Configure git"
+- name: "Git | Configure git user email"
   ansible.builtin.command:
-    cmd: git config --global user.email "23105954+Younis-Ahmed@users.noreply.github.com" && git config --global user.name "Younis-Ahmed"
+    cmd: git config --global user.email "23105954+Younis-Ahmed@users.noreply.github.com"
+
+- name: "Git | Configure git user name"
+  ansible.builtin.command:
+    cmd: git config --global user.name "Younis Ahmed"
