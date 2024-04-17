@@ -6,3 +6,7 @@
       - git
     state: present
   become: true
+
+- name: "Git | Configure git"
+  ansible.builtin.command:
+    cmd: git config --global user.email "23105954+Younis-Ahmed@users.noreply.github.com" && git config --global user.name "Younis-Ahmed"
