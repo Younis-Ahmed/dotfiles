@@ -64,4 +64,6 @@
   ansible.builtin.npm:
     name: pnpm
     global: yes
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
   become: true
