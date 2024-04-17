@@ -6,6 +6,9 @@ default_roles:
   - python
   - bat
   - neovim
+  - git
+  - node
+  - typescript
 
 zsh_private:
   OPENAI_API_KEY: !vault |
