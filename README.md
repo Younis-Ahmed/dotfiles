@@ -19,6 +19,9 @@ I've added limited batch of my tools...i'll be working on the rest when it make 
 - `git`
 - `nvim`
 - `bash`
+- `pnpm`
+- `node`
+- `nvm`
 - fonts
 
 Assumptions
