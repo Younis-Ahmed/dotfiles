@@ -22,5 +22,5 @@
   ansible.builtin.shell: |
     if [ -f "{{ ansible_env.HOME }}/.nix-profile/share/oh-my-zsh/templates/zshrc.zsh-template" ]; then
       echo "Setting up oh-my-zsh..."
-      cp -r {{ ansible_env.HOME }}/.nix-profile/share/oh-my-zsh {{ ansible_env.HOME }}/.oh-my-zsh
+      cp -r {{ ansible_env.HOME }}/.nix-profile/share/oh-my-zsh {{ ansible_env.HOME }}/.config/.oh-my-zsh
     fi
