@@ -28,7 +28,8 @@
 - name : Zsh | Set powerlevel10k theme
   ansible.builtin.git:
     repo: 'https://github.com/romkatv/powerlevel10k.git'
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/themes/powerlevel10k"
+    dest: "{{ ansible_env.HOME }}/.config/.oh-my-zsh/themes/powerlevel10k"
   register: p10k_theme
+  become: true
   when: p10k_install.changed == true
     
