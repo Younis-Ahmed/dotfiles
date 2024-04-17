@@ -9,9 +9,11 @@
 - name: Zsh | Install zsh-syntax-highlighting
   ansible.builtin.git:
     repo: 'https://github.com/zsh-users/zsh-syntax-highlighting.git'
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    dest: "{{ ansible_env.HOME }}/.config/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+  become: true
 
 - name: Zsh | zsh-auto-suggestions | Install
   ansible.builtin.git:
     repo: 'https://github.com/zsh-users/zsh-autosuggestions'
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+    dest: "{{ ansible_env.HOME }}/.config/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+  become: true
