@@ -17,7 +17,8 @@
     - gcc
     - unzip
 
-- name: Neovim | Kickstart | Run Task/s
-  ansible.builtin.git:
-    repo: "https://github.com/nvim-lua/kickstart.nvim.git"
+- name: Copy files to nvim config directory
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/"
     dest: "{{ ansible_env.HOME }}/.config/nvim/"
+    remote_src: yes
