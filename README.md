@@ -22,6 +22,8 @@ I've added limited batch of my tools...i'll be working on the rest when it make 
 - `pnpm`
 - `node`
 - `nvm`
+- `ts`
+- `python`
 - fonts
 
 Assumptions
@@ -46,8 +48,8 @@ I used ansible-vault to encrypt and store sensitive data. You need to create:
   
 - Create file with sensitive data using the following
 ```sh
-   ansible-vault create file_with_sensitive_data
-   ```
+ansible-vault create file_with_sensitive_data
+```
 - Copy and paste it on `all.yml` on `zsh_private` with suited key name 
 
 **Usage:**
@@ -57,24 +59,30 @@ To use these dotfiles, follow these steps:
 
 1. **Clone the repository:**
 
-   ```
-   git clone https://github.com/Younis-Ahmed/dotfiles.git
-   ```
+```sh
+git clone https://github.com/Younis-Ahmed/dotfiles.git
+```
 
 2. **`cd` into repository:**
 
-   ```
-   cd dotfiles
-   ```
+```bash
+cd dotfiles
+```
 
 3. **Run project**
-   ``` ansible-playbook main.yml ```
+```bash
+ansible-playbook main.yml 
+```
 
 4. **source bashrc**
-``` . $HOME/.bashrc ```
+```bash
+ . $HOME/.bashrc 
+```
 
 5. **source zshrc**
-``` source $HOME/.zshrc ```
+```sh
+source $HOME/.zshrc 
+```
 
 License
 -------
