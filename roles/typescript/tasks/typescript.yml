@@ -1,0 +1,58 @@
+---
+
+- name: Typescript | Check if typescript is installed
+  ansible.builtin.command: nix-env -q --installed typescript
+  register: typescript_version
+  ignore_errors: true
+  changed_when: false
+
+- name: Typescript | Set typescript_env_check
+  ansible.builtin.set_fact:
+    typescript_env_check: "{{ typescript_version.rc == 0 }}"
+
+- name: Typescript | Install typescript
+  ansible.builtin.shell: |
+    echo "typescript is not installed on the system with Nix-env. Installing typescript..." &&
+    if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+      source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.typescript
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: typescript_install
+  when: typescript_env_check == false
+
+- debug:
+    var: typescript_install.stdout_lines
+  when: typescript_env_check == false
+
+- name: Typescript | Install typescript | Check if new version is available
+  ansible.builtin.shell: |
+    nix-env -q --compare-versions typescript
+  args:
+    executable: /bin/bash
+  register: typescript_version
+  changed_when: false
+  when: typescript_env_check == true
+
+- name: Typescript | Extract and compare versions
+  ansible.builtin.set_fact:
+    is_update_available: "{{ typescript_version.stdout.split()[0].split('-')[1] != typescript_version.stdout.split()[2] }}"
+  when: typescript_env_check == true
+
+- name: Typescript | Update typescript if new version is available
+  ansible.builtin.shell: |
+    if [ "{{ is_update_available }}" == "true" ]; then
+      echo "New version of typescript is available. Updating typescript to {{ typescript_version.stdout.split()[2] }}..."
+      nix-env -u nixpkgs.typescript
+    else
+      echo "typescript is up to date. {{ typescript_version.stdout.split()[0] }} no update available."
+    fi
+  args:
+    executable: /bin/bash
+  environment: 
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: typescript_update
+  changed_when: false
+  when: typescript_env_check == true
