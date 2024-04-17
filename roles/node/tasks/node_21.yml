@@ -1,0 +1,67 @@
+---
+
+- name: Node | Check if node is installed
+  ansible.builtin.command: nix-env -q --installed nodejs
+  register: node_version
+  ignore_errors: true
+  changed_when: false
+
+- name: Node | Set node_env_check
+  ansible.builtin.set_fact:
+    node_env_check: "{{ node_version.rc == 0 }}"
+
+- name: Node | Install nodejs
+  ansible.builtin.shell: |
+    echo "node is not installed on the system with Nix-env. Installing nodejs..." &&
+    if [ -f {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh ]; then
+      source {{ ansible_env.HOME }}/.nix-profile/etc/profile.d/nix.sh && nix-env -iA nixpkgs.nodejs
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: node_install
+  when: node_env_check == false
+
+- debug:
+    var: node_install.stdout_lines
+  when: node_env_check == false
+
+- name: Node | Install nodejs | Check if new version is available
+  ansible.builtin.shell: |
+    nix-env -q --compare-versions nodejs
+  args:
+    executable: /bin/bash
+  register: node_version
+  changed_when: false
+  when: node_env_check == true
+
+- name: Node | Extract and compare versions
+  ansible.builtin.set_fact:
+    is_update_available: "{{ node_version.stdout.split()[0].split('-')[1] != node_version.stdout.split()[2] }}"
+  when: node_env_check == true
+
+- name: Node | Update nodejs if new version is available
+  ansible.builtin.shell: |
+    if [ "{{ is_update_available }}" == "true" ]; then
+      echo "New version of nodejs is available. Updating nodejs to {{ node_version.stdout.split()[2] }}..."
+      nix-env -u nixpkgs.nodejs
+    else
+      echo "nodejs is up to date. {{ node_version.stdout.split()[0] }} no update available."
+    fi
+  args:
+    executable: /bin/bash
+  environment: 
+    PATH: "{{ ansible_env.HOME }}/.nix-profile/bin"
+  register: node_update
+  changed_when: false
+  when: node_env_check == true
+
+- debug:
+    var: node_update.stdout_lines
+
+- name: "pnpm | Install pnpm globally"
+  ansible.builtin.npm:
+    name: pnpm
+    global: yes
+  become: true
