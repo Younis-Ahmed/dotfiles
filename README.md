@@ -7,12 +7,12 @@ This project contains my personal dotfiles, which are configurations and customi
 Disclaimer
 ----------
 ⚠ ⚠ ⚠ 
-I use `nix-env` as my package manager, To get `nix-env` to work on ansible without declarative module to abstract the process. I had to improvise with eliminate _some_ idempotency nature of ansible.
+I use `nix-env` as my package manager, To get `nix-env` to work on ansible without a declarative module to abstract the process. I had to improvise with eliminating _some_ idempotency nature of ansible.
 If you so choose to use a different package manager then apply changes to the code.
 
 Configuration
 ----
-I've added limited batch of my tools...i'll be working on the rest when it make sense
+I've added a limited batch of my tools... I'll be working on the rest when it makes sense
 - `nix-env`
 - `zsh`
 - `bat`
@@ -50,7 +50,7 @@ I used ansible-vault to encrypt and store sensitive data. You need to create:
 ```sh
 ansible-vault create file_with_sensitive_data
 ```
-- Copy and paste it on `all.yml` on `zsh_private` with suited key name 
+- Copy and paste it on `all.yml` on `zsh_private` with the suited key name 
 
 **Usage:**
 --------
@@ -63,7 +63,7 @@ To use these dotfiles, follow these steps:
 git clone https://github.com/Younis-Ahmed/dotfiles.git
 ```
 
-2. **`cd` into repository:**
+2. **`cd` into the repository:**
 
 ```bash
 cd dotfiles
